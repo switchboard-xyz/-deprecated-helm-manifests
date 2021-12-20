@@ -1,0 +1,10 @@
+helm repo add vm https://victoriametrics.github.io/helm-charts/
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+
+
+helm install my-grafana grafana/grafana -f grafana-values.yaml
+kubectl apply -f dashboard.yaml -f grafana
+
+helm install vmsingle vm/victoria-metrics-single -f vmsingle-values.yaml
+

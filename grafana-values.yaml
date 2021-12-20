@@ -1,0 +1,30 @@
+persistence:
+  enabled: true
+  storageClassName: standard-rwo
+adminUser: admin
+adminPassword: password
+#service:
+  #loadBalancerIP: #TBD
+ingress:
+  enabled: true
+  hosts: ["grafana.switchboard.xyz"]
+  tls:
+  - hosts:
+      - grafana.switchboard.xyz
+    secretName: grafana-tls
+namespaceOverride: grafana
+sidecar:
+  dashboards:
+    enabled: true
+    labelValue: "true" 
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: victoriametrics
+        type: prometheus
+        url: "http://vmsingle-switchboard-vmsingle.default.svc:8429" #maybe port 8428
+        access: proxy
+        editable: true
+        isDefault: true
+        basicAuth: false
