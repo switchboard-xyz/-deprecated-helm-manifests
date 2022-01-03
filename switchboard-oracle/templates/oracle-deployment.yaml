@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: oracle
+  name: oracle-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oracle
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: oracle
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - oracle
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - env:
+        - 
+          name: RPC_URL
+          valueFrom: 
+            secretKeyRef: 
+              key: RPC_URL
+              name: oracle-secret
+        - 
+          name: LIVE
+          valueFrom: 
+            configMapKeyRef: 
+              key: LIVE
+              name: oracle-configmap
+        - 
+          name: CLUSTER
+          valueFrom: 
+            configMapKeyRef: 
+              key: CLUSTER
+              name: oracle-configmap
+        - 
+          name: HEARTBEAT_INTERVAL
+          valueFrom: 
+            configMapKeyRef: 
+              key: HEARTBEAT_INTERVAL
+              name: oracle-configmap
+        - 
+          name: GOOGLE_PAYER_SECRET_PATH
+          valueFrom: 
+            configMapKeyRef: 
+              key: GOOGLE_PAYER_SECRET_PATH
+              name: oracle-configmap
+        - 
+          name: METRICS_EXPORTER
+          valueFrom: 
+            configMapKeyRef: 
+              key: METRICS_EXPORTER
+              name: oracle-configmap
+        - 
+          name: GCP_CONFIG_BUCKET
+          valueFrom: 
+            configMapKeyRef: 
+              key: GCP_CONFIG_BUCKET
+              name: oracle-configmap
+        - 
+          name: ORACLE_KEY
+          valueFrom: 
+            secretKeyRef: 
+              key: ORACLE_KEY
+              name: oracle-secret
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
+        - name: BACKUP_MAINNET_RPC
+          value: "https://api.mainnet-beta.solana.com"
+        image: docker.io/switchboardlabs/node:dev-v2-12-30-21
+        imagePullPolicy: Always
+        name: oracle
+        ports:
+        - name: web
+          containerPort: 9090
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 3
+        resources:
+          limits:
+            cpu: 3000m
+            memory: 4092Mi
+          requests:
+            cpu: 3000m
+            memory: 4092Mi
+        volumeMounts:
+        - mountPath: /var/secrets/google
+          name: google-cloud-key
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: service-account

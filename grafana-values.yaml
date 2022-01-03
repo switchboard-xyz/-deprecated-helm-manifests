@@ -3,14 +3,17 @@ persistence:
   storageClassName: standard-rwo
 adminUser: admin
 adminPassword: password
-#service:
-  #loadBalancerIP: #TBD
+service:
+  type: LoadBalancer
+  loadBalancerIP: "34.102.45.171" 
+  #externalIPs:
+  #- "34.102.45.171" 
 ingress:
   enabled: true
-  hosts: ["grafana.switchboard.xyz"]
+  hosts: ["helm.switchboard.xyz"]
   tls:
   - hosts:
-      - grafana.switchboard.xyz
+      - "helm.switchboard.xyz"
     secretName: grafana-tls
 namespaceOverride: grafana
 sidecar:
@@ -23,7 +26,7 @@ datasources:
     datasources:
       - name: victoriametrics
         type: prometheus
-        url: "http://vmsingle-switchboard-vmsingle.default.svc:8429" #maybe port 8428
+        url: "http://vmsingle-victoria-metrics-single-server.default.svc:8428" #"http://vmsingle-switchboard-vmsingle.default.svc:8428" 
         access: proxy
         editable: true
         isDefault: true

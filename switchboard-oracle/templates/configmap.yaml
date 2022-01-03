@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oracle-configmap
+data:
+  LIVE: "1"
+  CLUSTER: {{ .Values.cluster }}
+  HEARTBEAT_INTERVAL: "15"
+  GOOGLE_PAYER_SECRET_PATH: {{ .Values.googlePayerSecretPath }}
+  GOOGLE_ORACLE_SECRET_PATH: {{ .Values.googleOracleSecretPath }}
+  METRICS_EXPORTER: {{ .Values.metricsExporter }}
+  GCP_CONFIG_BUCKET: {{ .Values.gcpConfigBucket }}
+  RPC_URL: {{ .Values.rpcUrl }} #is this being used or overwritten by the value in the oracle-secret?
+
