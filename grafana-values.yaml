@@ -3,18 +3,28 @@ persistence:
   storageClassName: standard-rwo
 adminUser: admin
 adminPassword: password
+resources:
+  requests:
+    memory: "1024Mi"
+    cpu: "500m"
+  limits:
+    memory: "1024Mi"
+    cpu: "500m"
 service:
-  type: LoadBalancer
-  loadBalancerIP: "34.102.45.171" 
+  type: ClusterIP
+  #loadBalancerIP: "34.102.45.171" 
   #externalIPs:
   #- "34.102.45.171" 
 ingress:
   enabled: true
+  #annotations:
+  #  ingress.gcp.kubernetes.io/pre-shared-cert: grafana-ingress # the name of the SSL certificate resource you created
+  #  kubernetes.io/ingress.global-static-ip-name: helm-global # the name of the static ip resource you created
   hosts: ["helm.switchboard.xyz"]
   tls:
   - hosts:
       - "helm.switchboard.xyz"
-    secretName: grafana-tls
+    #secretName: grafana-tls
 namespaceOverride: grafana
 sidecar:
   dashboards:

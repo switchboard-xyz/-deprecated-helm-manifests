@@ -37,6 +37,12 @@ spec:
               key: RPC_URL
               name: oracle-secret
         - 
+          name: PAGERDUTY_EVENT_KEY
+          valueFrom: 
+            secretKeyRef: 
+              key: PAGERDUTY_EVENT_KEY
+              name: oracle-secret
+        - 
           name: LIVE
           valueFrom: 
             configMapKeyRef: 
