@@ -186,7 +186,10 @@ fi
 if ! grep -q "^GRAFANA_HOSTNAME=.*$" "$outEnvFile"; then
   printf 'GRAFANA_HOSTNAME="%s"\n' "" | tee -a "$outEnvFile"
 fi
-if ! grep -q "^GRAFANA_HOSTNAME=.*$" "$outEnvFile"; then
-  printf 'GRAFANA_HOSTNAME="%s"\n' "" | tee -a "$outEnvFile"
+if ! grep -q "^GRAFANA_TLS_CRT=.*$" "$outEnvFile"; then
+  printf 'GRAFANA_TLS_CRT="%s"\n' "" | tee -a "$outEnvFile"
+fi
+if ! grep -q "^GRAFANA_TLS_KEY=.*$" "$outEnvFile"; then
+  printf 'GRAFANA_TLS_KEY="%s"\n' "" | tee -a "$outEnvFile"
 fi
 echo -e "\nEnvironment variables saved to ${outEnvFile}"

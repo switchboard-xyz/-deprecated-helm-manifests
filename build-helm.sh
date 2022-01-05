@@ -28,15 +28,16 @@ set -a
 . "$envFile"
 set +a
 
-if [[ -z "${PAGERDUTY_EVENT_KEY}" ]]; then
-  PAGERDUTY_EVENT_KEY="UNDEFINED"
-fi
-if [[ -z "${ORACLE_KEY}" ]]; then
-  echo "failed to set ORACLE_KEY"
+if [[ -z "${CLUSTER}" ]]; then
+  echo "failed to set CLUSTER"
   exit 1
 fi
 if [[ -z "${RPC_URL}" ]]; then
   echo "failed to set RPC_URL"
+  exit 1
+fi
+if [[ -z "${ORACLE_KEY}" ]]; then
+  echo "failed to set ORACLE_KEY"
   exit 1
 fi
 if [[ -z "${GOOGLE_PAYER_SECRET_PATH}" ]]; then
@@ -51,8 +52,22 @@ if [[ -z "${EXTERNAL_IP}" ]]; then
   echo "failed to set EXTERNAL_IP"
   exit 1
 fi
+if [[ -z "${PAGERDUTY_EVENT_KEY}" ]]; then
+  PAGERDUTY_EVENT_KEY="UNDEFINED"
+fi
 if [[ -z "${GRAFANA_HOSTNAME}" ]]; then
   echo "failed to set GRAFANA_HOSTNAME"
+  exit 1
+fi
+if [[ -z "${GRAFANA_ADMIN_PASSWORD}" ]]; then
+  GRAFANA_ADMIN_PASSWORD="SbCongraph50!"
+fi
+if [[ -z "${GRAFANA_TLS_CRT}" ]]; then
+  echo "failed to set GRAFANA_TLS_CRT"
+  exit 1
+fi
+if [[ -z "${GRAFANA_TLS_KEY}" ]]; then
+  echo "failed to set GRAFANA_TLS_KEY"
   exit 1
 fi
 
