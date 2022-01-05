@@ -168,10 +168,9 @@ gcloud container clusters get-credentials $cluster_name --project $project --reg
 
 outEnvFile="${project}.env"
 touch $outEnvFile
-if ! grep -q "^GRAFANA_ADMIN_PASSWORD=.*$" $outEnvFile; then
-  printf 'GRAFANA_ADMIN_PASSWORD="%s"\n' "SbCongraph50!" | tee -a $outEnvFile
+if ! grep -q "^CLUSTER=.*$" $outEnvFile; then
+  printf 'CLUSTER="%s"\n' "devnet" | tee -a $outEnvFile
 fi
-
 printf 'PROJECT_ID="%s"\n' $project | sed -Ei '' "s/(^PROJECT_ID=.*$)/\1/" $outEnvFile
 printf 'DEFAULT_REGION="%s"\n' $region | sed -Ei '' "s/(^DEFAULT_REGION=.*$)/\1/" $outEnvFile
 printf 'DEFAULT_ZONE="%s"\n' $zone | sed -Ei '' "s/(^DEFAULT_ZONE=.*$)/\1/" $outEnvFile
@@ -181,4 +180,13 @@ printf 'SECRET_NAME="%s"\n' $secret_name | sed -Ei '' "s/(^SECRET_NAME=.*$)/\1/"
 printf 'GOOGLE_PAYER_SECRET_PATH="%s"\n' $google_payer_secret_path | sed -Ei '' "s/(^GOOGLE_PAYER_SECRET_PATH=.*$)/\1/" $outEnvFile
 printf 'SERVICE_ACCOUNT_EMAIL="%s"\n' $service_account_email | sed -Ei '' "s/(^SERVICE_ACCOUNT_EMAIL=.*$)/\1/" $outEnvFile
 printf 'SERVICE_ACCOUNT_BASE64="%s"\n' $service_account_base64 | sed -Ei '' "s/(^SERVICE_ACCOUNT_BASE64=.*$)/\1/" $outEnvFile
+if ! grep -q "^GRAFANA_ADMIN_PASSWORD=.*$" $outEnvFile; then
+  printf 'GRAFANA_ADMIN_PASSWORD="%s"\n' "SbCongraph50!" | tee -a $outEnvFile
+fi
+if ! grep -q "^GRAFANA_HOSTNAME=.*$" $outEnvFile; then
+  printf 'GRAFANA_HOSTNAME="%s"\n' "" | tee -a $outEnvFile
+fi
+if ! grep -q "^GRAFANA_HOSTNAME=.*$" $outEnvFile; then
+  printf 'GRAFANA_HOSTNAME="%s"\n' "" | tee -a $outEnvFile
+fi
 echo -e "\nEnvironment variables saved to ${outEnvFile}"
