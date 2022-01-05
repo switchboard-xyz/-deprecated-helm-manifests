@@ -1,0 +1,4 @@
+secrets/**
+.keypairs/**
+/**.json
+**.env
