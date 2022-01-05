@@ -2,7 +2,7 @@ persistence:
   enabled: true
   storageClassName: standard-rwo
 adminUser: admin
-adminPassword: password
+adminPassword: SbCongraph50!
 resources:
   requests:
     memory: "1024Mi"
@@ -12,24 +12,17 @@ resources:
     cpu: "500m"
 service:
   type: ClusterIP
-  #loadBalancerIP: "34.102.45.171" 
-  #externalIPs:
-  #- "34.102.45.171" 
 ingress:
   enabled: true
-  #annotations:
-  #  ingress.gcp.kubernetes.io/pre-shared-cert: grafana-ingress # the name of the SSL certificate resource you created
-  #  kubernetes.io/ingress.global-static-ip-name: helm-global # the name of the static ip resource you created
   hosts: ["helm.switchboard.xyz"]
   tls:
   - hosts:
       - "helm.switchboard.xyz"
-    #secretName: grafana-tls
 namespaceOverride: grafana
 sidecar:
   dashboards:
     enabled: true
-    labelValue: "true" 
+    labelValue: "1" 
 datasources:
   datasources.yaml:
     apiVersion: 1
@@ -41,3 +34,17 @@ datasources:
         editable: true
         isDefault: true
         basicAuth: false
+
+notifiers:
+    name: PagerDuty
+    type: pagerduty
+    uid: pagerduty1
+    org_id: 1
+    is_default: true
+    send_reminder: true
+    frequency: 5m
+    disable_resolve_message: false
+    settings:
+      autoResolve: true
+    secure_settings:
+      integrationKey: 'faafe60385384309c077ed61303e50d0'

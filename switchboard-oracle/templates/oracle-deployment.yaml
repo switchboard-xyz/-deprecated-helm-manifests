@@ -1,9 +1,11 @@
+{{- $values := .Values -}}
+{{- range $index, $key := .Values.oracleKeys }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     app: oracle
-  name: oracle-deployment
+  name: oracle-deployment-{{ $key.name }}
 spec:
   replicas: 1
   selector:
@@ -32,63 +34,41 @@ spec:
       - env:
         - 
           name: RPC_URL
-          valueFrom: 
-            secretKeyRef: 
-              key: RPC_URL
-              name: oracle-secret
+          value: {{ $values.rpcUrl }}
         - 
           name: PAGERDUTY_EVENT_KEY
-          valueFrom: 
-            secretKeyRef: 
-              key: PAGERDUTY_EVENT_KEY
-              name: oracle-secret
+          value: {{ $values.pagerdutyEventKey }}
         - 
           name: LIVE
-          valueFrom: 
-            configMapKeyRef: 
-              key: LIVE
-              name: oracle-configmap
+          value: "1"
         - 
           name: CLUSTER
-          valueFrom: 
-            configMapKeyRef: 
-              key: CLUSTER
-              name: oracle-configmap
+          value: {{ $values.cluster }}
         - 
           name: HEARTBEAT_INTERVAL
-          valueFrom: 
-            configMapKeyRef: 
-              key: HEARTBEAT_INTERVAL
-              name: oracle-configmap
+          value: "15"
         - 
           name: GOOGLE_PAYER_SECRET_PATH
-          valueFrom: 
-            configMapKeyRef: 
-              key: GOOGLE_PAYER_SECRET_PATH
-              name: oracle-configmap
+          value: {{ $values.googlePayerSecretPath }}
+        - 
+          name: GOOGLE_ORACLE_SECRET_PATH
+          value: {{ $values.googleOracleSecretPath }}
         - 
           name: METRICS_EXPORTER
-          valueFrom: 
-            configMapKeyRef: 
-              key: METRICS_EXPORTER
-              name: oracle-configmap
+          value: {{ $values.metricsExporter }}
         - 
           name: GCP_CONFIG_BUCKET
-          valueFrom: 
-            configMapKeyRef: 
-              key: GCP_CONFIG_BUCKET
-              name: oracle-configmap
+          value: {{ $values.gcpConfigBucket }}
         - 
           name: ORACLE_KEY
-          valueFrom: 
-            secretKeyRef: 
-              key: ORACLE_KEY
-              name: oracle-secret
-        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: {{ $key.data }}
+        - 
+          name: GOOGLE_APPLICATION_CREDENTIALS
           value: /var/secrets/google/key.json
-        - name: BACKUP_MAINNET_RPC
+        - 
+          name: BACKUP_MAINNET_RPC
           value: "https://api.mainnet-beta.solana.com"
-        image: docker.io/switchboardlabs/node:dev-v2-12-30-21
+        image: {{ $values.image }}
         imagePullPolicy: Always
         name: oracle
         ports:
@@ -115,3 +95,5 @@ spec:
       - name: google-cloud-key
         secret:
           secretName: service-account
+---
+{{ end }}

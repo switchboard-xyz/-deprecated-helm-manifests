@@ -2,14 +2,14 @@
 add and update helm charts:
 helm repo add vm https://victoriametrics.github.io/helm-charts/
 helm repo add grafana https://grafana.github.io/helm-charts
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add nginx-stable https://helm.nginx.com/stable
 helm repo update
 
 install to cluster:
 helm install grafana grafana/grafana -f grafana-values.yaml
 kubectl apply -f dashboard.yaml -n grafana
 helm install vmsingle vm/victoria-metrics-single -f vmetrics-values.yaml
-helm install nginx-helm stable/nginx-ingress -f nginx-values.yaml
+helm install nginx-helm nginx-stable/nginx-ingress -f nginx-values.yaml
 helm install switchboard-oracle ./switchboard-oracle -f ./switchboard-oracle/values.yaml --dry-run
 
 
