@@ -113,13 +113,16 @@ else
   echo -e "\nCreating service account: ${service_account_name}"
   gcloud iam service-accounts create $service_account_name --display-name="$service_account_display_name" --project $project
 fi
-mkdir -p secrets
-gcloud iam service-accounts keys create $service_account_file --iam-account=$service_account_email --project $project
+if [ ! -f $service_account_file ]
+then
+  mkdir -p secrets
+  gcloud iam service-accounts keys create $service_account_file --iam-account=$service_account_email --project $project
+fi
 service_account_base64=$(base64 $service_account_file)
 
 ## Create External IP
 external_ip_name="cluster-external-ip"
-if gcloud compute addresses list  --project $project| grep -q "^${external_ip_name}\s"; 
+if gcloud compute addresses list  --project $project | grep -q "^${external_ip_name}\s"; 
 then
   echo -e "\nexternal ipv4 address already exists: ${external_ip_name}"
 else
@@ -165,6 +168,10 @@ gcloud container clusters get-credentials $cluster_name --project $project --reg
 
 outEnvFile="${project}.env"
 touch $outEnvFile
+if ! grep -q "^GRAFANA_ADMIN_PASSWORD=.*$" $outEnvFile; then
+  printf 'GRAFANA_ADMIN_PASSWORD="%s"\n' "SbCongraph50!" | tee -a $outEnvFile
+fi
+
 printf 'PROJECT_ID="%s"\n' $project | sed -Ei '' "s/(^PROJECT_ID=.*$)/\1/" $outEnvFile
 printf 'DEFAULT_REGION="%s"\n' $region | sed -Ei '' "s/(^DEFAULT_REGION=.*$)/\1/" $outEnvFile
 printf 'DEFAULT_ZONE="%s"\n' $zone | sed -Ei '' "s/(^DEFAULT_ZONE=.*$)/\1/" $outEnvFile
