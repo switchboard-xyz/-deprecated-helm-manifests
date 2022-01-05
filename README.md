@@ -2,32 +2,31 @@
 
 ## Setup
 
-```bash
-helm repo add vm https://victoriametrics.github.io/helm-charts/
-helm repo add grafana https://grafana.github.io/helm-charts
-helm repo add nginx-stable https://helm.nginx.com/stable
-helm repo add stable https://charts.helm.sh/stable
-helm repo update
-```
-
-## Env
-
-customers must modify:
-
-- helm/grafana-values.yaml (username/password, ingress/tls hosts)
-- helm/nginx-values.yaml (loadBalancerIP, certs, possibly setAsDefaultIngress)
-- helm/switchboard-oracle/values.yaml (pretty much everything)
-
-## Install
+You will need to first setup a GCP project and provision your account. The following script will walk you through the steps, where PROJECTNAME contains no spaces or special characters and will be the name of your GCP project:
 
 ```bash
-helm install grafana grafana/grafana -f helm/grafana-values.yaml
-kubectl apply -f dashboard.yaml -n grafana
-helm install vmsingle vm/victoria-metrics-single -f helm/vmetrics-values.yaml
-helm install nginx-helm nginx-stable/nginx-ingress -f helm/nginx-values.yaml
-helm install switchboard-oracle helm/switchboard-oracle -f helm/switchboard-oracle/values.yaml
+./setup-gcloud.sh PROJECTNAME
 ```
 
-## Other
+Upon succesful completion, you will have an env file containing your google cloud configuration. You will need to manually add
 
-todo: set resource requests for init/sidecar containers
+- RPC_URL
+- ORACLE_KEY
+- GRAFANA_TLS_CRT
+- GRAFANA_TLS_KEY
+- GRAFANA_HOSTNAME
+- GRAFANA_ADMIN_PASSWORD
+
+## Deploy
+
+Using the same `PROJECTNAME` as above, run the following command to build the helm charts for your deployment:
+
+```bash
+./build-helm.sh PROJECTNAME
+```
+
+Then deploy your helm charts to your GCP cluster:
+
+```bash
+./deploy-helm.sh PROJECTNAME
+```
