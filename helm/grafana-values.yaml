@@ -29,7 +29,7 @@ datasources:
     datasources:
       - name: victoriametrics
         type: prometheus
-        url: "http://vmsingle-victoria-metrics-single-server.default.svc:8428" #"http://vmsingle-switchboard-vmsingle.default.svc:8428"
+        url: "http://vmsingle-victoria-metrics-single-server.default.svc:8428"
         access: proxy
         editable: true
         isDefault: true
