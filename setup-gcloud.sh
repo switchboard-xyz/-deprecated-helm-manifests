@@ -104,7 +104,7 @@ fi
 ## Create Service Account
 service_account_display_name="Oracle Service Account"
 service_account_name="oracle-svc-account"
-service_account_file="secrets/$service_account_name.json"
+service_account_file="secrets/$service_account_name.private-key.json"
 service_account_email="${service_account_name}@${project}.iam.gserviceaccount.com"
 if gcloud iam service-accounts list --project "$project" | grep -q "${service_account_email}\s"; 
 then
@@ -113,11 +113,19 @@ else
   echo -e "\nCreating service account: ${service_account_name}"
   gcloud iam service-accounts create $service_account_name --display-name="$service_account_display_name" --project "$project"
 fi
-if [ ! -f $service_account_file ]
-then
-  mkdir -p secrets
-  gcloud iam service-accounts keys create $service_account_file --iam-account="$service_account_email" --project "$project"
-fi
+while true; do
+  if [ ! -s $service_account_file ]
+  then
+    mkdir -p secrets
+    if ! gcloud iam service-accounts keys create $service_account_file --iam-account="$service_account_email" --project "$project"; then
+      echo "failed to create new svc-account key and output file is empty - deleting and recreating svc-account key"
+      lastKeyId=$(gcloud iam service-accounts keys list --iam-account="$service_account_email" | awk 'NR==2' | grep -o "^\w*\b" | tr -d '\n')
+      gcloud iam service-accounts keys delete "$lastKeyId" --iam-account="$service_account_email" --project "$project"
+      continue
+    fi
+  fi
+  break
+done
 service_account_base64=$(base64 $service_account_file)
 
 ## Create External IP
