@@ -59,7 +59,7 @@ printf '\nCert Signing Request File: %s' "$csr_file"
 
 echo -e "\n\ncomplete the steps to sign your tls certificate https://gethttpsforfree.com"
 
-echo -e "\n\texport PRIV_KEY=$tls_privkey_file"
+echo -e "\n\texport PRIV_KEY=\"$tls_privkey_file\""
 
 crt_file=$(realpath "secrets/${project}-domain.crt")
 key_file=$(realpath "secrets/${project}-intermediate.key")
@@ -70,7 +70,7 @@ if [[ ! -f "$crt_file" || ! -s "$crt_file" ]]; then
 fi
 grafana_tls_crt=$(base64 "$crt_file")
 grafana_tls_crt_str=$(printf 'GRAFANA_TLS_CRT="%s"' "$grafana_tls_crt")
-echo "$grafana_tls_crt_str"
+printf "\n%s\n" "$grafana_tls_crt_str"
 
 if [[ ! -f "$key_file" || ! -s "$key_file" ]]; then
     printf '\ncomplete the steps and save the tls cert files to:\n\t%s\n\t%s\n' "$crt_file" "$key_file"
@@ -78,12 +78,4 @@ if [[ ! -f "$key_file" || ! -s "$key_file" ]]; then
 fi
 grafana_tls_key=$(base64 "$key_file")
 grafana_tls_key_str=$(printf 'GRAFANA_TLS_KEY="%s"' "$grafana_tls_key")
-echo "$grafana_tls_key_str"
-
-
-# outEnvFile="${project}.env"
-# # echo $(awk -v replace="$grafana_tls_crt_str" 'sub(/^GRAFANA_TLS_CRT=.*$|$/,replace)' "$outEnvFile") > "$outEnvFile"
-# sed -Ei '' "s/(^GRAFANA_TLS_KEY=.*$)/GRAFANA_TLS_KEY=\"$grafana_tls_key\"\n/" "$outEnvFile"
-# # printf 'GRAFANA_HOSTNAME="%s"\n' "$domain" | sed -Ei '' "s/(^GRAFANA_HOSTNAME=.*$)/\1/" "$outEnvFile"
-
-# echo -e "\n\nEnvironment variables saved to ${outEnvFile}"
+printf "\n%s\n" "$grafana_tls_key_str"
