@@ -5,6 +5,8 @@ set -e
 
 stty sane # dont show backspace char during prompts
 
+script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 ## Get Project Name
 project=$1
 if [ -z "$project" ];
@@ -174,30 +176,16 @@ else
 fi
 gcloud container clusters get-credentials $cluster_name --project "$project" --region $region
 
-outEnvFile="${project}.env"
-touch "$outEnvFile"
-if ! grep -q "^CLUSTER=.*$" "$outEnvFile"; then
-  printf 'CLUSTER="%s"\n' "devnet" | tee -a "$outEnvFile"
-fi
-printf 'PROJECT_ID="%s"\n' "$project" | sed -Ei '' "s/(^PROJECT_ID=.*$)/\1/" "$outEnvFile"
-printf 'DEFAULT_REGION="%s"\n' "$region" | sed -Ei '' "s/(^DEFAULT_REGION=.*$)/\1/" "$outEnvFile"
-printf 'DEFAULT_ZONE="%s"\n' "$zone" | sed -Ei '' "s/(^DEFAULT_ZONE=.*$)/\1/" "$outEnvFile"
-printf 'CLUSTER_NAME="%s"\n' "$cluster_name" | sed -Ei '' "s/(^CLUSTER_NAME=.*$)/\1/" "$outEnvFile"
-printf 'EXTERNAL_IP="%s"\n' "$external_ip" | sed -Ei '' "s/(^EXTERNAL_IP=.*$)/\1/" "$outEnvFile"
-printf 'SECRET_NAME="%s"\n' "$secret_name" | sed -Ei '' "s/(^SECRET_NAME=.*$)/\1/" "$outEnvFile"
-printf 'GOOGLE_PAYER_SECRET_PATH="%s"\n' "$google_payer_secret_path" | sed -Ei '' "s/(^GOOGLE_PAYER_SECRET_PATH=.*$)/\1/" "$outEnvFile"
-printf 'SERVICE_ACCOUNT_EMAIL="%s"\n' "$service_account_email" | sed -Ei '' "s/(^SERVICE_ACCOUNT_EMAIL=.*$)/\1/" "$outEnvFile"
-printf 'SERVICE_ACCOUNT_BASE64="%s"\n' "$service_account_base64" | sed -Ei '' "s/(^SERVICE_ACCOUNT_BASE64=.*$)/\1/" "$outEnvFile"
-if ! grep -q "^GRAFANA_ADMIN_PASSWORD=.*$" "$outEnvFile"; then
-  printf 'GRAFANA_ADMIN_PASSWORD="%s"\n' "SbCongraph50!" | tee -a "$outEnvFile"
-fi
-if ! grep -q "^GRAFANA_HOSTNAME=.*$" "$outEnvFile"; then
-  printf 'GRAFANA_HOSTNAME="%s"\n' "" | tee -a "$outEnvFile"
-fi
-if ! grep -q "^GRAFANA_TLS_CRT=.*$" "$outEnvFile"; then
-  printf 'GRAFANA_TLS_CRT="%s"\n' "" | tee -a "$outEnvFile"
-fi
-if ! grep -q "^GRAFANA_TLS_KEY=.*$" "$outEnvFile"; then
-  printf 'GRAFANA_TLS_KEY="%s"\n' "" | tee -a "$outEnvFile"
-fi
-echo -e "\nEnvironment variables saved to ${outEnvFile}"
+printf "\n"
+"$script_dir"/scripts/save-env-value.sh "$project" "CLUSTER" "devnet"
+"$script_dir"/scripts/save-env-value.sh "$project" "PROJECT_ID" "$project" 
+"$script_dir"/scripts/save-env-value.sh "$project" "DEFAULT_REGION" "$region"
+"$script_dir"/scripts/save-env-value.sh "$project" "DEFAULT_ZONE" "$zone"
+"$script_dir"/scripts/save-env-value.sh "$project" "CLUSTER_NAME" "$cluster_name"
+"$script_dir"/scripts/save-env-value.sh "$project" "EXTERNAL_IP" "$external_ip"
+"$script_dir"/scripts/save-env-value.sh "$project" "SECRET_NAME" "$secret_name"
+"$script_dir"/scripts/save-env-value.sh "$project" "GOOGLE_PAYER_SECRET_PATH" "$google_payer_secret_path"
+"$script_dir"/scripts/save-env-value.sh "$project" "SERVICE_ACCOUNT_EMAIL" "$service_account_email"
+"$script_dir"/scripts/save-env-value.sh "$project" "SERVICE_ACCOUNT_BASE64" "$service_account_base64"
+
+echo -e "\nEnvironment variables saved to ${project}.env"

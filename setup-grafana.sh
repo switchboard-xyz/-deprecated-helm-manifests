@@ -4,6 +4,8 @@ set -e
 
 stty sane # dont show backspace char during prompts
 
+script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 ## Get Project Name
 project=$1
 if [ -z "$project" ];
@@ -48,6 +50,7 @@ if [ ! -s "$csr_file" ]; then
             read -rp "Enter an email for your TLS CRT: " email
         ;;
     esac
+    "$script_dir"/scripts/save-env-value.sh "$project" "GRAFANA_HOSTNAME" "$domain"
     openssl req -new -nodes -key "$csr_privkey_file" -out "$csr_file" -subj "/CN=${domain}/emailAddress=${email}"
 fi
 tls_csr=$(<"$csr_file")
@@ -79,3 +82,11 @@ fi
 grafana_tls_key=$(base64 "$key_file")
 grafana_tls_key_str=$(printf 'GRAFANA_TLS_KEY="%s"' "$grafana_tls_key")
 printf "\n%s\n" "$grafana_tls_key_str"
+
+
+"$script_dir"/scripts/save-env-value.sh "$project" "GRAFANA_TLS_CRT" "$grafana_tls_crt"
+"$script_dir"/scripts/save-env-value.sh "$project" "GRAFANA_TLS_KEY" "$grafana_tls_key"
+
+echo -e "\nEnvironment variables saved to ${project}.env"
+
+exit 0

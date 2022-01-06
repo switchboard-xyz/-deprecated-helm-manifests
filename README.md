@@ -12,10 +12,19 @@ Upon succesful completion, you will have an env file containing your google clou
 
 - RPC_URL
 - ORACLE_KEY
+
+Next we will need to provision the TLS certificate to view the Grafana dashboard
+
+```bash
+./setup-grafana.sh PROJECTNAME DOMAIN EMAIL
+```
+
+Follow the instructions then add the following outputted variables to the env file:
+
+- GRAFANA_HOSTNAME (your domain/subdomain that will host your grafana dashboard)
+- GRAFANA_ADMIN_PASSWORD (can be set to any string used to login to the admin account)
 - GRAFANA_TLS_CRT
 - GRAFANA_TLS_KEY
-- GRAFANA_HOSTNAME
-- GRAFANA_ADMIN_PASSWORD
 
 ## Deploy
 

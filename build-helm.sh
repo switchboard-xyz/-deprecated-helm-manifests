@@ -4,7 +4,7 @@ set -e
 
 stty sane # dont show backspace char during prompts
 
-scriptDir=$(dirname "$0")
+script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 ## Get Project Name
 configName=$1
@@ -76,7 +76,7 @@ outputPath=$(realpath "$prefix$configName")
 echo "output Path: $outputPath";
 
 mkdir -p "$outputPath"
-cp -r "${scriptDir}/helm/" "$outputPath/"
+cp -r "${script_dir}/helm/" "$outputPath/"
 
 files=(
 "$outputPath/dashboard.yaml"
@@ -92,3 +92,5 @@ for f in "${files[@]}"; do
 done
 
 rm "$outputPath/tmp.txt"
+
+exit 0
