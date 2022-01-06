@@ -3,15 +3,15 @@
 set -e
 
 ## Get Project Name
-configName=$1
-if [[ -z "${configName}" ]]; then
-  read -rp "Enter the name for the google cloud project (Ex. switchboard-oracle-cluster): " configName
+project=$1
+if [[ -z "${project}" ]]; then
+  read -rp "Enter the name for the google cloud project (Ex. switchboard-oracle-cluster): " project
 fi
-configName=$(echo "${configName// /-}" | awk '{print tolower($0)}') # Replace spaces with dashes and make lower case
-echo -e "config name: $configName"
+project=$(echo "${project// /-}" | awk '{print tolower($0)}') # Replace spaces with dashes and make lower case
+echo -e "project: $project"
 
 prefix="kubernetes-"
-helmDir=$(realpath "$prefix$configName")
+helmDir=$(realpath "$prefix$project")
 if [ -d "$helmDir" ]
 then
     echo "helm directory: $helmDir";
@@ -28,11 +28,16 @@ helm repo add stable https://charts.helm.sh/stable
 helm repo update
 
 ## Deploy Helm Charts
-# kubectl create ns grafana || true
-helm install grafana grafana/grafana -f "$helmDir/grafana-values.yaml"
-kubectl apply -f "$helmDir/dashboard.yaml" -n grafana
-helm install vmsingle vm/victoria-metrics-single -f "$helmDir/vmetrics-values.yaml"
-helm install nginx-helm nginx-stable/nginx-ingress -f "$helmDir/nginx-values.yaml"
-helm install switchboard-oracle helm/switchboard-oracle -f "$helmDir/switchboard-oracle/values.yaml"
+if ! kubectl apply -f "$helmDir/dashboard.yaml" -n grafana
+then
+  kubectl create ns grafana
+  kubectl apply -f "$helmDir/dashboard.yaml" -n grafana
+fi
 
-printf "\nHelm charts deployed from %s" "${helmDir}"
+helm upgrade -i grafana grafana/grafana -f "$helmDir/grafana-values.yaml"
+helm upgrade -i vmsingle vm/victoria-metrics-single -f "$helmDir/vmetrics-values.yaml"
+helm upgrade -i nginx-helm nginx-stable/nginx-ingress -f "$helmDir/nginx-values.yaml"
+helm upgrade -i switchboard-oracle helm/switchboard-oracle -f "$helmDir/switchboard-oracle/values.yaml"
+
+
+printf "\nHelm charts deployed from %s\n" "${helmDir}"

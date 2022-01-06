@@ -7,18 +7,18 @@ stty sane # dont show backspace char during prompts
 script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 ## Get Project Name
-configName=$1
-if [[ -z "${configName}" ]]; then
-  read -rp "Enter the name for the google cloud project (Ex. switchboard-oracle-cluster): " configName
+project=$1
+if [[ -z "${project}" ]]; then
+  read -rp "Enter the name for the google cloud project (Ex. switchboard-oracle-cluster): " project
 fi
-configName=$(echo "${configName// /-}" | awk '{print tolower($0)}') # Replace spaces with dashes and make lower case
-echo -e "config name: $configName"
+project=$(echo "${project// /-}" | awk '{print tolower($0)}') # Replace spaces with dashes and make lower case
+echo -e "project: $project"
 
-envFile="$configName.env"
+envFile="$project.env"
 if [ -f "$envFile" ]
 then
     envFile=$(realpath "${envFile}")
-    echo "env File: $envFile"
+    echo "env file: $envFile"
 else
     echo "failed to find env file: $envFile"
     exit 1
@@ -28,8 +28,26 @@ set -a
 . "$envFile"
 set +a
 
+prefix="kubernetes-"
+outputPath=$(realpath "$prefix$project")
+echo "output path: $outputPath";
+
+mkdir -p "$outputPath"
+cp -r "${script_dir}/helm/" "$outputPath/"
+
+files=(
+"$outputPath/dashboard.yaml"
+"$outputPath/grafana-values.yaml"
+"$outputPath/nginx-values.yaml"
+"$outputPath/vmetrics-values.yaml"
+"$outputPath/switchboard-oracle/values.yaml"
+)
+
 if [[ -z "${CLUSTER}" ]]; then
   echo "failed to set CLUSTER"
+  exit 1
+elif [[ "$CLUSTER" != "devnet" && "$CLUSTER" != "mainnet-beta" && "$CLUSTER" != "localnet" ]]; then
+  echo "invalid CLUSTER ($CLUSTER) - [devnet, mainnet-beta, or localnet]"
   exit 1
 fi
 if [[ -z "${RPC_URL}" ]]; then
@@ -53,14 +71,14 @@ if [[ -z "${EXTERNAL_IP}" ]]; then
   exit 1
 fi
 if [[ -z "${PAGERDUTY_EVENT_KEY}" ]]; then
-  PAGERDUTY_EVENT_KEY="UNDEFINED"
+  PAGERDUTY_EVENT_KEY="${PAGERDUTY_EVENT_KEY:-UNDEFINED}"
 fi
 if [[ -z "${GRAFANA_HOSTNAME}" ]]; then
   echo "failed to set GRAFANA_HOSTNAME"
   exit 1
 fi
 if [[ -z "${GRAFANA_ADMIN_PASSWORD}" ]]; then
-  GRAFANA_ADMIN_PASSWORD="SbCongraph50!"
+  GRAFANA_ADMIN_PASSWORD="${GRAFANA_ADMIN_PASSWORD:-SbCongraph50!}"
 fi
 if [[ -z "${GRAFANA_TLS_CRT}" ]]; then
   echo "failed to set GRAFANA_TLS_CRT"
@@ -70,24 +88,23 @@ if [[ -z "${GRAFANA_TLS_KEY}" ]]; then
   echo "failed to set GRAFANA_TLS_KEY"
   exit 1
 fi
+if [[ -z "${METRICS_EXPORTER}" ]]; then
+  METRICS_EXPORTER="${METRICS_EXPORTER:-prometheus}"
+elif [[ "$METRICS_EXPORTER" != "prometheus" && "$CLUSTER" != "gcp" && "$CLUSTER" != "opentelemetry-collector" ]]; then
+  echo "invalid METRICS_EXPORTER ($METRICS_EXPORTER) - [prometheus, gcp, or opentelemetry-collector]"
+  exit 1
+fi
 
-prefix="kubernetes-"
-outputPath=$(realpath "$prefix$configName")
-echo "output Path: $outputPath";
-
-mkdir -p "$outputPath"
-cp -r "${script_dir}/helm/" "$outputPath/"
-
-files=(
-"$outputPath/dashboard.yaml"
-"$outputPath/grafana-values.yaml"
-"$outputPath/nginx-values.yaml"
-"$outputPath/vmetrics-values.yaml"
-"$outputPath/switchboard-oracle/values.yaml"
-)
+printf "metrics: %s\n" "$METRICS_EXPORTER"
+printf "pager: %s\n" "$PAGERDUTY_EVENT_KEY"
 
 for f in "${files[@]}"; do
-  envsubst '$CLUSTER $RPC_URL $ORACLE_KEY $GOOGLE_PAYER_SECRET_PATH $SERVICE_ACCOUNT_BASE64 $EXTERNAL_IP $PAGERDUTY_EVENT_KEY $GRAFANA_HOSTNAME $GRAFANA_ADMIN_PASSWORD $GRAFANA_TLS_CRT $GRAFANA_TLS_KEY' < "$f" | tee "$outputPath/tmp.txt" ;
+  PAGERDUTY_EVENT_KEY="$PAGERDUTY_EVENT_KEY" \
+  METRICS_EXPORTER="$METRICS_EXPORTER" \
+  GRAFANA_ADMIN_PASSWORD="$GRAFANA_ADMIN_PASSWORD"\
+  envsubst '$CLUSTER $RPC_URL $ORACLE_KEY $GOOGLE_PAYER_SECRET_PATH $SERVICE_ACCOUNT_BASE64 $EXTERNAL_IP $PAGERDUTY_EVENT_KEY $GRAFANA_HOSTNAME $GRAFANA_ADMIN_PASSWORD $GRAFANA_TLS_CRT $GRAFANA_TLS_KEY $METRICS_EXPORTER' < "$f" \
+  | tee "$outputPath/tmp.txt" \
+  > /dev/null ;
   cat "$outputPath/tmp.txt" > "$f";
 done
 

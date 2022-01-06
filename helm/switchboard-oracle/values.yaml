@@ -1,7 +1,7 @@
 cluster: $CLUSTER
 googlePayerSecretPath: $GOOGLE_PAYER_SECRET_PATH
 googleOracleSecretPath: $GOOGLE_PAYER_SECRET_PATH
-metricsExporter: "prometheus"
+metricsExporter: $METRICS_EXPORTER
 gcpConfigBucket: "oracle-configs:configs.json"
 rpcUrl: $RPC_URL
 pagerdutyEventKey: $PAGERDUTY_EVENT_KEY
@@ -10,3 +10,5 @@ keyJson: $SERVICE_ACCOUNT_BASE64
 oracleKeys:
   - name: idx-1
     data: $ORACLE_KEY
+  # - name: idx-2
+  #   data: $ORACLE_KEY

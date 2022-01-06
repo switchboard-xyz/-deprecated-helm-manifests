@@ -28,7 +28,7 @@ datasources:
     apiVersion: 1
     datasources:
       - name: victoriametrics
-        type: prometheus
+        type: $METRICS_EXPORTER
         url: "http://vmsingle-victoria-metrics-single-server.default.svc:8428"
         access: proxy
         editable: true
