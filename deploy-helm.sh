@@ -39,5 +39,6 @@ helm upgrade -i vmsingle vm/victoria-metrics-single -f "$helmDir/vmetrics-values
 helm upgrade -i nginx-helm nginx-stable/nginx-ingress -f "$helmDir/nginx-values.yaml"
 helm upgrade -i switchboard-oracle helm/switchboard-oracle -f "$helmDir/switchboard-oracle/values.yaml"
 
-
 printf "\nHelm charts deployed from %s\n" "${helmDir}"
+
+exit 0
