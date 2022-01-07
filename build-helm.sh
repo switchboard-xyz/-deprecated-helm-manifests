@@ -95,9 +95,6 @@ elif [[ "$METRICS_EXPORTER" != "prometheus" && "$CLUSTER" != "gcp" && "$CLUSTER"
   exit 1
 fi
 
-printf "metrics: %s\n" "$METRICS_EXPORTER"
-printf "pager: %s\n" "$PAGERDUTY_EVENT_KEY"
-
 for f in "${files[@]}"; do
   PAGERDUTY_EVENT_KEY="$PAGERDUTY_EVENT_KEY" \
   METRICS_EXPORTER="$METRICS_EXPORTER" \

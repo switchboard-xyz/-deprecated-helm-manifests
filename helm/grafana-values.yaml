@@ -14,6 +14,8 @@ service:
   type: ClusterIP
 ingress:
   enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
   hosts: [$GRAFANA_HOSTNAME]
   tls:
     - hosts:

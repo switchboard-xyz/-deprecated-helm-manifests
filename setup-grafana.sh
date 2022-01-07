@@ -72,17 +72,14 @@ if [[ ! -f "$crt_file" || ! -s "$crt_file" ]]; then
     exit 0
 fi
 grafana_tls_crt=$(base64 "$crt_file")
-grafana_tls_crt_str=$(printf 'GRAFANA_TLS_CRT="%s"' "$grafana_tls_crt")
-printf "\n%s\n" "$grafana_tls_crt_str"
+printf "\nprintf 'GRAFANA_TLS_CRT=\"%s\"\n" "$grafana_tls_crt"
 
 if [[ ! -f "$key_file" || ! -s "$key_file" ]]; then
     printf '\ncomplete the steps and save the tls cert files to:\n\t%s\n\t%s\n' "$crt_file" "$key_file"
     exit 0
 fi
 grafana_tls_key=$(base64 "$key_file")
-grafana_tls_key_str=$(printf 'GRAFANA_TLS_KEY="%s"' "$grafana_tls_key")
-printf "\n%s\n" "$grafana_tls_key_str"
-
+printf "\nprintf 'GRAFANA_TLS_KEY=\"%s\"\n" "$grafana_tls_key"
 
 "$script_dir"/scripts/save-env-value.sh "$project" "GRAFANA_TLS_CRT" "$grafana_tls_crt"
 "$script_dir"/scripts/save-env-value.sh "$project" "GRAFANA_TLS_KEY" "$grafana_tls_key"

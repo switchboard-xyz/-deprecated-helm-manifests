@@ -2,6 +2,8 @@
 
 set -e
 
+### SHOULD WE ENSURE WERE CONNECTED TO THE RIGHT K8S BEFORE RUNNING?
+
 ## Get Project Name
 project=$1
 if [[ -z "${project}" ]]; then
