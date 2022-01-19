@@ -105,7 +105,7 @@ fi
 
 ## Create Service Account
 service_account_display_name="Oracle Service Account"
-service_account_name="oracle-svc-account"
+service_account_name=$(echo "${service_account_display_name// /-}" | awk '{print tolower($0)}') # Replace spaces with dashes and make lower case
 service_account_file="secrets/$service_account_name.private-key.json"
 service_account_email="${service_account_name}@${project}.iam.gserviceaccount.com"
 if gcloud iam service-accounts list --project "$project" | grep -q "${service_account_email}\s"; 

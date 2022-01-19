@@ -2,7 +2,7 @@
 
 set -e
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 stty sane # dont show backspace char during prompts
 
@@ -47,7 +47,20 @@ else
 fi
 google_payer_secret_path="$(gcloud secrets list --uri --filter="${secret_name}" --project "$project" | cut -c41- | tr -d '\n')/versions/latest"
 
-"$SCRIPT_DIR"/save-env-value.sh "$project" "SECRET_NAME" "$secret_name"
-"$SCRIPT_DIR"/save-env-value.sh "$project" "GOOGLE_PAYER_SECRET_PATH" "$google_payer_secret_path"
+printf "secret: %s\n" "$google_payer_secret_path"
+
+
+read -rp "Want to save values to $project.env? (y/n)? " answer
+case ${answer:0:1} in
+    y|Y )
+    "$script_dir"/save-env-value.sh "$project" "SECRET_NAME" "$secret_name"
+    "$script_dir"/save-env-value.sh "$project" "GOOGLE_PAYER_SECRET_PATH" "$google_payer_secret_path"
+    ;;
+    * )
+        echo "User Exited"
+        exit 0
+    ;;
+esac
+
 
 exit 0
