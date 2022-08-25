@@ -4,11 +4,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    chain: aptos
     app: oracle
     should_scrape: scrape
     queue: {{ $key.queue }}
-  name: {{ $key.queue }}-oracle-{{ $key.name }}
-  #namespace: {{ $key.queue }}
+  name: aptos-{{ $key.queue }}-oracle-{{ $key.name }}
 spec:
   replicas: 1
   selector:
@@ -21,10 +21,10 @@ spec:
   template:
     metadata:
       labels:
+        chain: aptos
         app: oracle
         queue: {{ $key.queue }}
         should_scrape: scrape
-        queue: {{ $key.queue }}
     spec:
       affinity:
         podAntiAffinity:
@@ -38,53 +38,55 @@ spec:
             topologyKey: kubernetes.io/hostname
       containers:
       - env:
+      # APTOS CONFIG
         - 
-          name: RPC_URL
+          name: CHAIN
+          value: "aptos"
+        - 
+          name: APTOS_RPC_URL
           value: {{ $values.rpcUrl }}
         - 
-          name: WS_URL
-          value: {{ $values.wsUrl }}
+          name: APTOS_PID
+          value: {{ $values.pid }}
         - 
-          name: PAGERDUTY_EVENT_KEY
-          value: {{ $values.pagerdutyEventKey }}
+          name: APTOS_STATE_ADDRESS
+          value: {{ $values.stateAddress }}
         - 
-          name: LIVE
-          value: "1"
+          name: APTOS_CRANK_ADDRESS
+          value: {{ $values.crankAddress }}
+      # ORACLE CONFIG
         - 
-          name: CLUSTER
-          value: {{ $values.cluster }}
+          name: APTOS_ORACLE_KEY
+          value: {{ $key.data }}
         - 
           name: HEARTBEAT_INTERVAL
           value: {{ $values.heartbeatInterval | quote}}
+      # SECRETS
         - 
           name: GOOGLE_PAYER_SECRET_PATH
           value: {{ $values.googlePayerSecretPath }}
         - 
-          name: METRICS_EXPORTER
-          value: {{ $values.metricsExporter }}
+          name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
+      # TASK RUNNER CONFIG
+        - 
+          name: TASK_RUNNER_SOLANA_RPC
+          value: {{ $values.solanaMainnetRpc }}
         - 
           name: GCP_CONFIG_BUCKET
           value: {{ $values.gcpConfigBucket }}
+
+      # MONITORING CONFIG
         - 
-          name: ORACLE_KEY
-          value: {{ $key.data }}
-        - 
-          name: GOOGLE_APPLICATION_CREDENTIALS
-          value: /var/secrets/google/key.json
-        - 
-          name: BACKUP_MAINNET_RPC
-          value: {{ $values.backupMainnetUrl }}
-        # -
-          # name: NONCE_FLAG
-          # value: "1"
-        # -
-          # name: NONCE_QUEUE_SIZE
-          # value: "1000"
+          name: METRICS_EXPORTER
+          value: {{ $values.metricsExporter }}
+        # - 
+        #   name: PAGERDUTY_EVENT_KEY
+        #   value: {{ $values.pagerdutyEventKey }}
+      # IMAGE / RESOURCES
         image: {{ $values.image }}
         imagePullPolicy: Always
-        name: oracle
-        command: ["/bin/sh","-c"]
-        args: ["while true; do node --enable-source-maps sbv2-oracle; done"]
+        name: aptos-oracle
         ports:
         - name: web
           containerPort: 9090
@@ -97,17 +99,18 @@ spec:
           # periodSeconds: 3
         resources:
           limits:
-            cpu: 1500m
-            memory: 4092Mi
+            cpu: 2048m
+            memory: 2048Mi
           requests:
-            cpu: 1500m
-            memory: 4092Mi
+            cpu: 2048m
+            memory: 2048Mi
         volumeMounts:
         - mountPath: /var/secrets/google
           name: google-cloud-key
       volumes:
       - name: google-cloud-key
         secret:
-          secretName: service-account
+          secretName: oracle-service-account
 ---
 {{ end }}
+

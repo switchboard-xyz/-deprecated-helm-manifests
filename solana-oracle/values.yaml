@@ -1,3 +1,4 @@
+chain: "solana"
 cluster: $CLUSTER
 googlePayerSecretPath: $GOOGLE_PAYER_SECRET_PATH
 googleOracleSecretPath: $GOOGLE_PAYER_SECRET_PATH

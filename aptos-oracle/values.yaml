@@ -1,0 +1,20 @@
+chain: "aptos"
+cluster: "mainnet-beta"
+googlePayerSecretPath: $GOOGLE_PAYER_SECRET_PATH
+googleOracleSecretPath: $GOOGLE_PAYER_SECRET_PATH
+solanaMainnetRpc: $TASK_RUNNER_SOLANA_RPC
+pid: $APTOS_PID
+stateAddress: $APTOS_STATE_ADDRESS
+heartbeatInterval: $HEARTBEAT_INTERVAL
+gcpConfigBucket: $GCP_CONFIG_BUCKET
+rpcUrl: $APTOS_RPC_URL
+pagerdutyEventKey: $PAGERDUTY_EVENT_KEY
+image: "docker.io/switchboardlabs/node:dev-v2-08-24-22"
+keyJson: $SERVICE_ACCOUNT_BASE64
+oracleKeys:
+  - name: idx-1
+    data: $ORACLE_KEY
+    queue: permissioned
+  # - name: idx-2
+  #   data: $ORACLE_KEY
+  #   queue: permissioned
