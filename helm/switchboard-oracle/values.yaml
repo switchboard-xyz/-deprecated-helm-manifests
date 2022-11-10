@@ -6,7 +6,7 @@ metricsExporter: $METRICS_EXPORTER
 gcpConfigBucket: $GCP_CONFIG_BUCKET
 rpcUrl: $RPC_URL
 wsUrl: $WS_URL
-backupMainnetUrl: $BACKUP_MAINNET_RPC
+taskRunnerSolanaUrl: $TASK_RUNNER_SOLANA_RPC
 pagerdutyEventKey: $PAGERDUTY_EVENT_KEY
 image: "docker.io/switchboardlabs/node:dev-v2-1-5-22a"
 keyJson: $SERVICE_ACCOUNT_BASE64
