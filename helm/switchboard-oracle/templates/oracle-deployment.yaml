@@ -83,7 +83,7 @@ spec:
         imagePullPolicy: Always
         name: oracle
         command: ["/bin/sh","-c"]
-        args: ["while true; do node --enable-source-maps sbv2-oracle; done"]
+        args: ["while true; do node --enable-source-maps dist; done"]
         ports:
         - name: web
           containerPort: 9090
